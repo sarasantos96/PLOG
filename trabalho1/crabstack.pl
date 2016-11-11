@@ -21,7 +21,7 @@ playerTurn(PlayerBoard,Turn, Mode):-
 	Turn == 2 -> player2_turn(PlayerBoard,Mode);
 	write('Wrong player Turn').
 
-player1_turn(B1,PlayerMode1,PlayerMode):-
+player1_turn(B1,PlayerMode1):-
 	display_players_info,nl,nl,
 	print_gameboard(B1),
 	write('Player1 Turn. Choose the crab to move'),nl,
