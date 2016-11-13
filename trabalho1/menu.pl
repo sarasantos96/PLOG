@@ -37,7 +37,7 @@ select_main_option(2):- clear_screen, display_instructions.
 select_main_option(3).
 
 read_play_option:- read(PlayOption), select_play_option(PlayOption).
-select_play_option(1):- clear_screen,initial_board(Board), play_game(Board).
+select_play_option(1):- clear_screen,empty_board(Board), play_game(Board).
 select_play_option(2):- clear_screen,initial_board(Board), play_game_computer(Board).
 select_play_option(3):- clear_screen, initial_board(Board), play_computer_computer(Board).
 

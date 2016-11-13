@@ -17,3 +17,6 @@ display_players_info:-
 
 print_separador:-
 	write('***************************************************************************'),nl,nl.
+
+list_empty([], true).
+list_empty([_|_], false).

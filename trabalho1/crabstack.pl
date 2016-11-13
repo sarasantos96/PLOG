@@ -130,7 +130,7 @@ build_moves(BoardGame,R,C,PRow, PCol,[Peca|PecaT]):-
 	(Peca == cp1 ; Peca == cp2) ->(build_small_moves(BoardGame,R,C,PRow, PCol));
 	(Peca == cm1 ; Peca == cm2) ->(build_medium_moves(BoardGame,R,C,PRow,PCol));
 	(Peca == cg1 ; Peca == cg2) ->(build_big_moves(BoardGame,R,C,PRow,PCol)); 
-	(write('')).
+	(append([],[],R), append([],[],C)).
 
 
 build_small_moves(BS,SmallRowList,SmallColList,RowS, ColS):-
@@ -184,8 +184,6 @@ build_big_moves(BB,BigRowList, BigColList, RowB, ColB):-
 	((isInsideBoard(Y2,X6), validBigMove(BB, Y2, X6) )-> (append(Temp9,[X6],Temp11), append(Temp10,[Y2],Temp12)) ; (append(Temp9,[],Temp11), append(Temp10,[],Temp12))),
 	BigColList = Temp11, BigRowList = Temp12.
 
-list_empty([], true).
-list_empty([_|_], false).	
 
 display_available_moves([],[],N).
 display_available_moves([AR|ARs],[AC|ACs],N):-
@@ -210,31 +208,37 @@ moves_available_player1([B|Bs],Board,RowI):-
 
 moves_available_row_player1([],Board,IndexR,IndexC):- false.
 moves_available_row_player1([R|Rs],Board,IndexR, IndexC):-
-	(is_available_player1_crab(R,Board,IndexR, IndexC) -> true; 
+	(is_available_player1_crab(Board,IndexR, IndexC) -> true; 
 														  (NewCI is IndexC +1, moves_available_row_player1(Rs,Board, IndexR, NewCI))).
 
-is_available_player1_crab(Peca,Board, IR , IC):-
-	build_moves(Board,R,C,IR, IC,Peca),
-	list_empty(R, Moves),
-	((isplayer1Crab(Peca), Moves == false) -> true; false).
+is_available_player1_crab(Board, IR , IC):-
+	nth1(IR,Board, TempRowList),
+	nth1(IC,TempRowList, Crab),
+	build_moves(Board,RLis,CLis,IR, IC,Crab),
+	list_empty(RLis, T),
+	( T -> !, false ;(isplayer1Crab(Crab) -> true; !,false)).
 
-moves_available_player1([],Board,RowI):- false.
-moves_available_player1([B|Bs],Board,RowI):-
-	 (moves_available_row_player1(B,Board,RowI,0) -> true; 
-	 												(NewI is RowI +1, moves_available_player1(Bs,Board, NewI))).
+moves_available_player2([],Board,RowI):- false.
+moves_available_player2([B|Bs],Board,RowI):-
+	 (moves_available_row_player2(B,Board,RowI,0) -> true; 
+	 												(NewI is RowI +1, moves_available_player2(Bs,Board, NewI))).
 
 moves_available_row_player2([],Board,IndexR,IndexC):- false.
 moves_available_row_player2([R|Rs],Board,IndexR, IndexC):-
-	(is_available_player2_crab(R,Board,IndexR, IndexC) -> true; 
+	(is_available_player2_crab(Board,IndexR, IndexC) -> true; 
 														  (NewCI is IndexC +1, moves_available_row_player2(Rs,Board, IndexR, NewCI))).
 
-is_available_player2_crab(Peca,Board, IR , IC):-
-	build_moves(Board,R,C,IR, IC,Peca),
-	list_empty(R, Moves),
-	((isplayer2Crab(Peca), Moves == false) -> true; false).
+is_available_player2_crab(Board, IR , IC):-
+	nth1(IR,Board, TempRowList),
+	nth1(IC,TempRowList, Crab),
+	build_moves(Board,RLis,CLis,IR, IC,Crab),
+	list_empty(RLis, T),
+	( T -> !, false ;(isplayer2Crab(Crab) -> true; !,false)).
+
+
 
 test_end(Board):-
-	(not(moves_available_player1(Board,Board,0)) -> write('Game continues'); write('Game ends')).
+	(moves_available_player2(Board,Board,0) -> write('Game continues'); write('Game ends')).
 
 display_list([]).
 display_list([LH | LT]):-
