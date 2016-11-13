@@ -13,3 +13,7 @@ new_line(_,_).
 display_players_info:- 
 		write('Player 1 Crabs: a A * (small, medium, big)'),nl,
 		write('Player 2 Crabs: b B + (small, medium, big)').
+
+
+print_separador:-
+	write('***************************************************************************'),nl,nl.

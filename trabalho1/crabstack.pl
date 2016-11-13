@@ -1,4 +1,6 @@
-:-include('menu.pl').
+:- include('menu.pl').
+:- include('utilities.pl').
+:- include('board.pl').
 :- use_module(library(lists)).
 :- use_module(library(random)).
 
@@ -16,42 +18,61 @@ play_game_computer(B):-
 	clear_screen,
 	playerTurn(B,FirstTurn,Computer).
 
+play_computer_computer(B):-
+	FirstTurn = 1,
+	Computer = 2,
+	clear_screen,
+	playerTurn(B,FirstTurn, Computer).
+
 playerTurn(PlayerBoard,Turn, Mode):-
-	Turn == 1 -> player1_turn(PlayerBoard,Mode);
+	print_separador,
+	(Turn == 1 -> player1_turn(PlayerBoard,Mode);
 	Turn == 2 -> player2_turn(PlayerBoard,Mode);
-	write('Wrong player Turn').
+	write('Wrong player Turn')).
 
 player1_turn(B1,PlayerMode1):-
-	display_players_info,nl,nl,
-	print_gameboard(B1),
-	write('Player1 Turn. Choose the crab to move'),nl,
-	write('Row: '), read(Row1), nl,
-	write('Column: '),read(Col1),nl,
-	(isInsideBoard(Row1,Col1)-> true  ; (write('coord inv'),nl,player1_turn(B1))),
-	nth1(Row1,B1,BoardRow1),
-	nth1(Col1,BoardRow1,Pos1),
-	(isplayer1Crab(Pos1) -> true; (false, write('Not your crab!'),nl, NewBoard1 = B1, player1_turn(NewBoard1))),
-	write('Choose your move: '),nl,
-	build_moves(B1,RL1,CL1,Row1,Col1,Pos1),
-	list_empty(CL1,ColEmpty), list_empty(RL1, RowEmpty),
-	( (ColEmpty;RowEmpty)  -> (write('No available moves'), nl , NewBoard1 = B1,player1_turn(NewBoard1)); (display_available_moves(RL1,CL1, 0),read(O1), select_mov(O1,RL1,CL1,Row1,Col1,B1,Pos1,1,PlayerMode1))).
+	moves_available_player1(B1,B1,0) ->
+
+				(display_players_info,nl,nl,
+				print_gameboard(B1),
+				write('Player1 Turn. Choose the crab to move'),nl,
+				(PlayerMode1 == 2 -> (random(1,5,RowR), random(1,5,ColR));
+									 (write('Row: '), read(RowO), nl,write('Column: '),read(ColO),nl)),					 
+				(PlayerMode1 == 2 -> (Row1 = RowR, Col1 = ColR ) ; (Row1 = RowO, Col1 = ColO )),
+				(isInsideBoard(Row1,Col1)-> true  ; (write('coord inv'),nl,NewBoard1 = B1, player1_turn(NewBoard1,PlayerMode1))),
+				nth1(Row1,B1,BoardRow1),
+				nth1(Col1,BoardRow1,Pos1),
+				(isplayer1Crab(Pos1) -> true; (false, write('Not your crab!'),nl, NewBoard1 = B1, player1_turn(NewBoard1,PlayerMode1))),
+				write('Choose your move: '),nl,
+				build_moves(B1,RL1,CL1,Row1,Col1,Pos1),
+				list_empty(CL1,ColEmpty), list_empty(RL1, RowEmpty),
+				( (ColEmpty;RowEmpty)  -> (write('No available moves'), nl , NewBoard = B1, player1_turn(NewBoard,PlayerMode1)); 
+				  (PlayerMode1 == 2 -> (select_random_play(RL1,CL1,Row1,Col1,B1,Pos1,0,PlayerMode1));
+				  					   (display_available_moves(RL1,CL1, 0), read(O1), length(RL1,L), ((O1 > L; O1<1) -> player1_turn(B1,PlayerMode1); true),select_mov(O1,RL1,CL1,Row1,Col1,B1,Pos1,1,PlayerMode1))))); 
+
+				player2_won_menu.
 
 player2_turn(B2,PlayerMode2):-
-	display_players_info,nl,nl,
-	print_gameboard(B2),
-	write('Player2 Turn. Choose the crab to move'),nl,
-	write('Row: '), read(Row2), nl,
-	write('Column: '),read(Col2),nl,
-	(isInsideBoard(Row2,Col2)-> true ; (write('coord inv'),nl,NewBoard = B2, player2_turn(NewBoard))),
-	nth1(Row2,B2,BoardRow2),
-	nth1(Col2,BoardRow2,Pos2),
-	(isplayer2Crab(Pos2) -> true; (false,write('Not your crab!'),nl,NewBoard = B2, player2_turn(NewBoard))),
-	write('Choose your move: '),nl,
-	build_moves(B2,RL2,CL2,Row2,Col2,Pos2),
-	list_empty(CL2,ColEmpty), list_empty(RL2,RowEmpty),
-	( (ColEmpty;RowEmpty)  -> (write('No available moves'), nl , NewBoard = B2, player2_turn(NewBoard)); 
-	  (PlayerMode2 == 0 -> (display_available_moves(RL2,CL2, 0), read(O2), select_mov(O2,RL2,CL2,Row2,Col2,B2,Pos2,0,PlayerMode2));
-	  					   (select_random_play(RL2,CL2,Row2,Col2,B2,Pos2,0,PlayerMode2)))).
+				moves_available_player1(B2,B2,0) ->
+				(display_players_info,nl,nl,
+				print_gameboard(B2),
+				write('Player2 Turn. Choose the crab to move'),nl,
+				(PlayerMode2 == 0 -> (write('Row: '), read(RowO), nl,write('Column: '),read(ColO),nl);
+									 (random(1,5,RowR), random(1,5,ColR))),
+				(PlayerMode2 == 0 -> (Row2 = RowO, Col2 = ColO );  (Row2 = RowR, Col2 = ColR )),
+				write(Row2),nl,write(Col2),nl,	
+				(isInsideBoard(Row2,Col2)-> true ; (false,write('coord inv'),nl,NewBoard = B2, player2_turn(NewBoard,PlayerMode2))),
+				nth1(Row2,B2,BoardRow2),
+				nth1(Col2,BoardRow2,Pos2),
+				(isplayer2Crab(Pos2) -> true; (false,write('Not your crab!'),nl,NewBoard = B2, player2_turn(NewBoard,PlayerMode2))),
+				write('Choose your move: '),nl,
+				build_moves(B2,RL2,CL2,Row2,Col2,Pos2),
+				list_empty(CL2,ColEmpty), list_empty(RL2,RowEmpty),
+				( (ColEmpty;RowEmpty)  -> (write('No available moves'), nl , NewBoard = B2, player2_turn(NewBoard,PlayerMode2)); 
+				  (PlayerMode2 == 0 -> (display_available_moves(RL2,CL2, 0), read(O2), length(RL2,L), ((O2 > L; O2<1) -> player2_turn(B2, PlayerMode2); true), select_mov(O2,RL2,CL2,Row2,Col2,B2,Pos2,2,PlayerMode2));
+				  					   (select_random_play(RL2,CL2,Row2,Col2,B2,Pos2,0,PlayerMode2)))));
+
+				player1_won_menu.
 
 select_random_play(RL,CL,Rw,Cl,Bd,Ps,Tn,PMd):-
 	length(RL,Len),
@@ -109,7 +130,7 @@ build_moves(BoardGame,R,C,PRow, PCol,[Peca|PecaT]):-
 	(Peca == cp1 ; Peca == cp2) ->(build_small_moves(BoardGame,R,C,PRow, PCol));
 	(Peca == cm1 ; Peca == cm2) ->(build_medium_moves(BoardGame,R,C,PRow,PCol));
 	(Peca == cg1 ; Peca == cg2) ->(build_big_moves(BoardGame,R,C,PRow,PCol)); 
-	(write('Erro Peça nao existe'),nl).
+	(write('')).
 
 
 build_small_moves(BS,SmallRowList,SmallColList,RowS, ColS):-
@@ -180,3 +201,42 @@ select_mov(MovOption, MovRow, MovCol,OldRow,OldCol,GameB,OldPos, CurrentTurn, Ga
 	(CurrentTurn == 1 -> NextTurn = 2; NextTurn = 1),
 	updateBoard(GameB, NewGameB, OldRow, OldCol, NewRow, NewCol, OldPos),
 	playerTurn(NewGameB,NextTurn,GameMode).
+
+
+moves_available_player1([],Board,RowI):- false.
+moves_available_player1([B|Bs],Board,RowI):-
+	 (moves_available_row_player1(B,Board,RowI,0) -> true; 
+	 												(NewI is RowI +1, moves_available_player1(Bs,Board, NewI))).
+
+moves_available_row_player1([],Board,IndexR,IndexC):- false.
+moves_available_row_player1([R|Rs],Board,IndexR, IndexC):-
+	(is_available_player1_crab(R,Board,IndexR, IndexC) -> true; 
+														  (NewCI is IndexC +1, moves_available_row_player1(Rs,Board, IndexR, NewCI))).
+
+is_available_player1_crab(Peca,Board, IR , IC):-
+	build_moves(Board,R,C,IR, IC,Peca),
+	list_empty(R, Moves),
+	((isplayer1Crab(Peca), Moves == false) -> true; false).
+
+moves_available_player1([],Board,RowI):- false.
+moves_available_player1([B|Bs],Board,RowI):-
+	 (moves_available_row_player1(B,Board,RowI,0) -> true; 
+	 												(NewI is RowI +1, moves_available_player1(Bs,Board, NewI))).
+
+moves_available_row_player2([],Board,IndexR,IndexC):- false.
+moves_available_row_player2([R|Rs],Board,IndexR, IndexC):-
+	(is_available_player2_crab(R,Board,IndexR, IndexC) -> true; 
+														  (NewCI is IndexC +1, moves_available_row_player2(Rs,Board, IndexR, NewCI))).
+
+is_available_player2_crab(Peca,Board, IR , IC):-
+	build_moves(Board,R,C,IR, IC,Peca),
+	list_empty(R, Moves),
+	((isplayer2Crab(Peca), Moves == false) -> true; false).
+
+test_end(Board):-
+	(not(moves_available_player1(Board,Board,0)) -> write('Game continues'); write('Game ends')).
+
+display_list([]).
+display_list([LH | LT]):-
+	write(LH), nl,
+	write(LT).

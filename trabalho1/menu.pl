@@ -27,6 +27,7 @@ play_menu:- clear_screen,
 			display_title,nl,nl,
 			write('               1. Player vs Player                    '),nl,
 			write('               2. Player vs Computer                  '),nl,
+			write('               3. Computer vs Computer                '),nl,
 			read_play_option.
 
 
@@ -38,6 +39,7 @@ select_main_option(3).
 read_play_option:- read(PlayOption), select_play_option(PlayOption).
 select_play_option(1):- clear_screen,initial_board(Board), play_game(Board).
 select_play_option(2):- clear_screen,initial_board(Board), play_game_computer(Board).
+select_play_option(3):- clear_screen, initial_board(Board), play_computer_computer(Board).
 
 %% INSTRUCTIONS MENU FUNCTIONS %%
 display_instructions:-
@@ -50,5 +52,21 @@ display_instructions:-
 	write('1-Return to Main Menu'),nl,
 	read(Op), select_inst_option(Op).
 select_inst_option(1):-clear_screen, main_menu.
+
+player1_won_menu:-
+	clear_screen,
+	write('       ====================='),nl,
+	write('       =    PLAYER 1 WON   ='),nl,
+	write('       ====================='),nl,nl,
+	write(' 1- Return to main menu'),nl,
+	read(OP), main_menu.
+
+player2_won_menu:-
+	clear_screen,
+	write('       ====================='),nl,
+	write('       =    PLAYER 2 WON   ='),nl,
+	write('       ====================='),nl,nl,
+	write(' 1- Return to main menu'),nl,
+	read(OP), main_menu.
 
 
