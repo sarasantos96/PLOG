@@ -1,7 +1,9 @@
 :- include('board.pl').
 :- include('utilities.pl').
 
-%% MAIN MENU FUNCTIONS %%
+% ******************* %
+% MAIN MENU FUNCTIONS %
+% ******************* %
 display_title:-	write('==================================================='), nl,
 				write('= #### ####    #  ###    #### #####  #  #### #  # ='), nl, 
 				write('= #    #  #   # # #  #   #      #   # # #    #  # ='), nl,
@@ -23,6 +25,16 @@ main_menu:- clear_screen,
 			display_options,
 			read_main_option.
 
+read_main_option:- read(Option), select_main_option(Option).
+select_main_option(1):- clear_screen, play_menu.
+select_main_option(2):- clear_screen, display_instructions.
+select_main_option(3).
+
+
+
+% ******************* %
+% PLAY MENU FUNCTIONS %
+% ******************* %
 play_menu:- clear_screen,
 			display_title,nl,nl,
 			write('               1. Player vs Player                    '),nl,
@@ -31,17 +43,18 @@ play_menu:- clear_screen,
 			read_play_option.
 
 
-read_main_option:- read(Option), select_main_option(Option).
-select_main_option(1):- play_menu.
-select_main_option(2):- clear_screen, display_instructions.
-select_main_option(3).
 
 read_play_option:- read(PlayOption), select_play_option(PlayOption).
 select_play_option(1):- clear_screen,initial_board(Board), play_game(Board).
 select_play_option(2):- clear_screen,initial_board(Board), play_game_computer(Board).
 select_play_option(3):- clear_screen, initial_board(Board), play_computer_computer(Board).
+select_play_option(N):- clear_screen, play_menu.
 
-%% INSTRUCTIONS MENU FUNCTIONS %%
+
+
+% *************************** %
+% INSTRUCTIONS MENU FUNCTIONS %
+% *************************** %
 display_instructions:-
 	write('===================='),nl,
 	write('=   INSTRUCTIONS   ='),nl,
@@ -52,6 +65,11 @@ display_instructions:-
 	write('1-Return to Main Menu'),nl,
 	read(Op), select_inst_option(Op).
 select_inst_option(1):-clear_screen, main_menu.
+select_inst_option(N):- display_instructions.
+
+% ********************* %
+% WINNER MENU FUNCTIONS %
+% ********************* %
 
 player1_won_menu:-
 	clear_screen,
@@ -68,5 +86,3 @@ player2_won_menu:-
 	write('       ====================='),nl,nl,
 	write(' 1- Return to main menu'),nl,
 	read(OP), main_menu.
-
-

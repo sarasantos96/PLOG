@@ -1,19 +1,28 @@
 :-include('utilities.pl').
 
+% **************************** %
+% REPRESENTATION OF THE BOARD %
+% **************************** %
 
 empty_board(Board):-
-	Board=	[[[cg1,.],[cp2,.],[.]],
+	Board=	[[[.],[.],[.]],
 			[[.],[.],[.],[.]],
 			[[.],[.],[.],[.],[.]],
 			[[.],[.],[.],[.]],
 			[[.],[.],[.]]].
 
 initial_board(Board):-
-	Board = [[[cp1,.],[cp2,.],[cm1,.]],
-			[[cg1,.],[cg1,.],[cg2,.],[cm2,.]],
+	Board = [[[cp1,.],[cg1,.],[cm1,.]],
+			[[cp2,.],[cg1,.],[cg2,.],[cm2,.]],
 			[[cg2,.],[cm1,.],[cp1,.],[.],[cp2,.]],
 			[[cm2,.],[cg1,.],[cg2,.],[cm2,.]],
 			[[cp1,.],[cp2,.],[cm1,.]]].
+
+
+% ******************************************* %
+%       UPDATES THE BOARD IN EACH PLAY        % 
+%  Moves a piece from one position to another %
+% ******************************************* %
 
 updateBoard(BoardO,BoardU,OldR,OldC,NewR, NewC,[OldP|OldPs]):-
 	Row1 is OldR - 1,
@@ -33,7 +42,12 @@ replace( L , X , Y , Z, R) :-
   append(ColPfx,[_|ColSfx],Row) ,
   length(ColPfx,Y) ,
   append(ColPfx,[Z|ColSfx],RowNew) ,
-  append(RowPfx,[RowNew|RowSfx],R).                                
+  append(RowPfx,[RowNew|RowSfx],R).  
+
+
+% ************** %
+%   PRINT BOARD  %
+% ************** %
 
 print_gameboard(Board):- 
 	write('  '),

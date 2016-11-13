@@ -6,33 +6,44 @@
 
 crabstack:- main_menu.
 
-play_game(B):-
+% ***************************** %
+%     PLAY GAME FUNCTIONS       %
+%     For each game mode        %
+% ***************************** %
+
+play_game(B):-   %Player Vs Player 
     FirstTurn = 1,
     Computer = 0,
 	clear_screen,
 	playerTurn(B, FirstTurn,Computer).
 
-play_game_computer(B):-
+play_game_computer(B):- %Player Vs Computer 
 	FirstTurn = 1,
 	Computer = 1,
 	clear_screen,
 	playerTurn(B,FirstTurn,Computer).
 
-play_computer_computer(B):-
+play_computer_computer(B):-  %Computer Vs Computer 
 	FirstTurn = 1,
 	Computer = 2,
 	clear_screen,
 	playerTurn(B,FirstTurn, Computer).
 
-playerTurn(PlayerBoard,Turn, Mode):-
+
+
+% ******************************** %
+%  		GAME TURN FUNCTIONS        %
+% ******************************** %
+
+playerTurn(PlayerBoard,Turn, Mode):-  %Calls the right player to play a turn 
 	print_separador,
 	(Turn == 1 -> player1_turn(PlayerBoard,Mode);
 	Turn == 2 -> player2_turn(PlayerBoard,Mode);
 	write('Wrong player Turn')).
 
-player1_turn(B1,PlayerMode1):-
+player1_turn(B1,PlayerMode1):-        %Player 1 Turn
 	moves_available_player1(B1,B1,0) ->
-
+		%If there is any moves available, player picks a crab to move
 				(display_players_info,nl,nl,
 				print_gameboard(B1),
 				write('Player1 Turn. Choose the crab to move'),nl,
@@ -49,11 +60,12 @@ player1_turn(B1,PlayerMode1):-
 				( (ColEmpty;RowEmpty)  -> (write('No available moves'), nl , NewBoard = B1, player1_turn(NewBoard,PlayerMode1)); 
 				  (PlayerMode1 == 2 -> (select_random_play(RL1,CL1,Row1,Col1,B1,Pos1,0,PlayerMode1));
 				  					   (display_available_moves(RL1,CL1, 0), read(O1), length(RL1,L), ((O1 > L; O1<1) -> player1_turn(B1,PlayerMode1); true),select_mov(O1,RL1,CL1,Row1,Col1,B1,Pos1,1,PlayerMode1))))); 
-
+	%Otherwise, player 2 is the winner
 				player2_won_menu.
 
-player2_turn(B2,PlayerMode2):-
-				moves_available_player1(B2,B2,0) ->
+player2_turn(B2,PlayerMode2):-      %Player 2  Turn
+	moves_available_player1(B2,B2,0) ->
+		%If there is any moves available, player picks a crab to move
 				(display_players_info,nl,nl,
 				print_gameboard(B2),
 				write('Player2 Turn. Choose the crab to move'),nl,
@@ -71,14 +83,21 @@ player2_turn(B2,PlayerMode2):-
 				( (ColEmpty;RowEmpty)  -> (write('No available moves'), nl , NewBoard = B2, player2_turn(NewBoard,PlayerMode2)); 
 				  (PlayerMode2 == 0 -> (display_available_moves(RL2,CL2, 0), read(O2), length(RL2,L), ((O2 > L; O2<1) -> player2_turn(B2, PlayerMode2); true), select_mov(O2,RL2,CL2,Row2,Col2,B2,Pos2,2,PlayerMode2));
 				  					   (select_random_play(RL2,CL2,Row2,Col2,B2,Pos2,0,PlayerMode2)))));
-
+		%Otherwise, player 2 is the winner
 				player1_won_menu.
 
+%AUX FUNCTION - Selects a random crab move
 select_random_play(RL,CL,Rw,Cl,Bd,Ps,Tn,PMd):-
 	length(RL,Len),
 	random(1, Len, Choice),
 	write(Choice),
 	select_mov(Choice,RL,CL,Rw,Cl,Bd,Ps,Tn,PMd).
+
+
+
+% *********************************** %
+%    FUNCTION TO VALIDATE MOVEMENT    %
+% *********************************** %
 
 validSmallMove(BoardSmall, RowCoordSmall, ColCoordSmall):-
 	nth1(RowCoordSmall, BoardSmall, NewRowB),
@@ -106,7 +125,7 @@ newPosBig([NS|NSs]):-
 	(NS == .) -> false;
 	true.
 
-isInsideBoard(Row,Col):-
+isInsideBoard(Row,Col):-   % Checks if coordenates are inside the game board
 	(Row > 5) -> false;
 	(Col > 5) -> false;
 	(Row < 1) -> false;
@@ -116,15 +135,22 @@ isInsideBoard(Row,Col):-
 	((Row == 3), Col > 5) -> false; true.
 
 
-isplayer1Crab([P1|P1s]):-
+isplayer1Crab([P1|P1s]):- % Checks if a crab belongs to player 1
 	P1 == cp1 -> true;
 	P1 == cm1 -> true;
 	P1 == cg1 -> true; false.
 
-isplayer2Crab([P2|P2s]):-
+isplayer2Crab([P2|P2s]):- % Checks if crab belongs to player 2
 	P2 == cp2 -> true;
 	P2 == cm2 -> true;
 	P2 == cg2 -> true; false.
+
+
+
+% ************************* %
+%  BUILD AVAILABLE MOVES    %
+%   Given a player crab     %
+% ************************* %
 
 build_moves(BoardGame,R,C,PRow, PCol,[Peca|PecaT]):-
 	(Peca == cp1 ; Peca == cp2) ->(build_small_moves(BoardGame,R,C,PRow, PCol));
@@ -185,13 +211,11 @@ build_big_moves(BB,BigRowList, BigColList, RowB, ColB):-
 	BigColList = Temp11, BigRowList = Temp12.
 
 
-display_available_moves([],[],N).
-display_available_moves([AR|ARs],[AC|ACs],N):-
-	N1 is N + 1,
-	write(N1),
-	write('-  Row: '), write(AR),
-	write('  Column: '), write(AC),nl,
-	display_available_moves(ARs,ACs,N1).
+
+% ************************************* %
+%     SELECTS THE PLAYER MOVEMENT       %
+% Updates the board and calls next turn %
+% ************************************* %
 
 select_mov(MovOption, MovRow, MovCol,OldRow,OldCol,GameB,OldPos, CurrentTurn, GameMode):-
 	nth1(MovOption, MovRow, NewRow),
@@ -200,6 +224,11 @@ select_mov(MovOption, MovRow, MovCol,OldRow,OldCol,GameB,OldPos, CurrentTurn, Ga
 	updateBoard(GameB, NewGameB, OldRow, OldCol, NewRow, NewCol, OldPos),
 	playerTurn(NewGameB,NextTurn,GameMode).
 
+
+% ****************************************** %
+% 	  EVALUATES THE GAME STATE/BOARD         %
+% Checks if a player has any available moves %
+% ****************************************** %
 
 moves_available_player1([],Board,RowI):- false.
 moves_available_player1([B|Bs],Board,RowI):-
@@ -234,13 +263,3 @@ is_available_player2_crab(Board, IR , IC):-
 	build_moves(Board,RLis,CLis,IR, IC,Crab),
 	list_empty(RLis, T),
 	( T -> !, false ;(isplayer2Crab(Crab) -> true; !,false)).
-
-
-
-test_end(Board):-
-	(moves_available_player2(Board,Board,0) -> write('Game continues'); write('Game ends')).
-
-display_list([]).
-display_list([LH | LT]):-
-	write(LH), nl,
-	write(LT).
