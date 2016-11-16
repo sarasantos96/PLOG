@@ -28,7 +28,7 @@ main_menu:- clear_screen,
 read_main_option:- read(Option), select_main_option(Option).
 select_main_option(1):- clear_screen, play_menu.
 select_main_option(2):- clear_screen, display_instructions.
-select_main_option(3).
+select_main_option(3):- halt.
 
 
 
