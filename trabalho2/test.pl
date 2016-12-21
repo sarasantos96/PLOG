@@ -1,6 +1,5 @@
 :- use_module(library(clpfd)).
 :- use_module(library(lists)).
-:- include('utilities.pl').
 
 %Every red peg must be next to exactly one yellow peg, no more no less
 %Every yellow peg must be next to exactly one green, no more no less
@@ -10,7 +9,8 @@
 %Red = 1, Yellow = 2, Green = 3, Blue = 4,
 	
 test(L,N):-
-	length(L,N),
+	Len is N * N,
+	length(L,Len),
 	domain(L,1,4),
 	element(PositionRed,L,1),
 	element(PositionYellow,L,2),
@@ -21,7 +21,7 @@ test(L,N):-
 	labeling([maximize(SumRed)],L).
 
 validate_Pos(PosRed,PosYellow,PosGreen,PosBlue):-
-	PosRed + 1 #= PosYellow #\/ PosRed-1 #= PosYellow #/\
-	PosYellow +1 #= PosGreen #\/ PosYellow -1 #= PosGreen #/\
-	PosGreen +1 #= PosBlue #\/ PosGreen -1 #= PosBlue #/\
-	PosBlue +1 #= PosRed #\/ PosBlue -1 #= PosRed.
+	(PosRed + 1 #= PosYellow #\/ PosRed-1 #= PosYellow) #/\
+	(PosYellow +1 #= PosGreen #\/ PosYellow -1 #= PosGreen) #/\
+	(PosGreen +1 #= PosBlue #\/ PosGreen -1 #= PosBlue) #/\
+	(PosBlue +1 #= PosRed #\/ PosBlue -1 #= PosRed).
