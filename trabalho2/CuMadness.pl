@@ -47,20 +47,12 @@ build_cube(Cube,N):-
 	labeling([maximize(SumF4)],F4),
 	labeling([maximize(SumF5)],F5),
 	labeling([maximize(SumF6)],F6),
-<<<<<<< HEAD
 	print_cuMadness(F1,F2,F3,F4,F5,F6,Max,Num,N),!.
 	
-validate_face(_, Len,Len,_).
-validate_face(List,Index,Length,N):-
-	get_neighbours(Index,[T,B,L,R],N,List),
-=======
-	print_top_lines(Num),
-	print_face(F4, 1, N, Max),!.
 
 validate_face_1(_, Len,Len,_,_).
 validate_face_1(List,Index,Length,N,[F2,F3,F4,F5]):-
 	get_neighbours_1(Index,[T,B,L,R],N,List, [F2,F3,F4,F5]),
->>>>>>> 2f2c77ae0d202255ce42cb659078833789aec986
 	element(Index, List, P),
 	validate([T,B,L,R],P),
 	NewIndex is Index + 1,
@@ -182,12 +174,12 @@ validate([T,B,L,R],P):-
 
 print_cuMadness(Face1,Face2,Face3,Face4,Face5,Face6,Limits,Number,N):-
 	SpaceLim is Limits +1,
-	print_spaces(1,SpaceLim,1),
+	print_spaces(1),
 	print_top_lines(Number),
 	print_face(Face1, 1, N, Limits,1),nl,
 	print_bot_lines(Number),write(' '),print_bot_lines(Number),write(' '),print_bot_lines(Number),print_bot_lines(Number),nl,
 	print_middle_faces(Face2,Face3,Face4,Face5,1,N,Limits),
-	print_spaces(1,SpaceLim,6),
+	print_spaces(6),
 	print_top_lines(Number),
 	print_face(Face6,1,N,Limits,6).
 
@@ -215,23 +207,19 @@ print_line(L, Index, N):-
 	NewI is Index + 1, NewN is N - 1,
 	print_line(L, NewI, NewN).
 
-print_spaces(_,_,2).
-print_spaces(_,_,3).
-print_spaces(_,_,4).
-print_spaces(_,_,5).
-print_spaces(Lim,Lim,_).
-print_spaces(I,Lim,FaceNumber):-
-	NextI is I + 1,
-	write(' '),
-	print_spaces(NextI,Lim,FaceNumber).
+
+print_spaces(1):-
+	write('             ').
+print_spaces(6):-
+	write('             ').
 
 print_face(_, Max, _, Max,FNumber).
 print_face(L, Index, N, Max,FNumber):-
 	SpaceLim is Max +1,
-	print_spaces(1,SpaceLim,FNumber),
+	print_spaces(FNumber),
 	print_line(L, Index, N),nl,
 	Num is N * 2,
-	print_spaces(1,SpaceLim,FNumber),
+	print_spaces(FNumber),
 	NewI is Index + N,
 	(NewI \== Max -> print_bot_lines(Num),nl ; print_bot_lines(Num)),
 	print_face(L, NewI, N, Max,FNumber).
@@ -243,7 +231,6 @@ print_middle_faces(F2,F3,F4,F5,Index, N, Max):-
 	print_line(F4, Index, N),
 	print_line(F5, Index, N),nl,
 	Num is N * 2,
-	print_spaces(1,Max,FNumber),
 	NewI is Index + N,
 	print_bot_lines(Num),write(' '),print_bot_lines(Num),write(' '),print_bot_lines(Num),write(' '),print_bot_lines(Num),nl,
 	print_middle_faces(F2,F3,F4,F5,NewI, N, Max).
