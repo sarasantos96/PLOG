@@ -47,8 +47,7 @@ build_cube(Cube,N):-
 	labeling([maximize(SumF4)],F4),
 	labeling([maximize(SumF5)],F5),
 	labeling([maximize(SumF6)],F6),
-	print_top_lines(Num),
-	print_face(F1, 1, N, Max),!.
+	print_cuMadness(F1,F2,F3,F4,F5,F6,Max,Num,N),!.
 	
 validate_face(_, Len,Len,_).
 validate_face(List,Index,Length,N):-
@@ -78,10 +77,25 @@ validate([T,B,L,R],P):-
 	(P #= 3 #=> BlueNeighbours #= 1),
 	(P #= 4 #=> RedNeighbours #= 1).
 	
+%=====================================================================
+%PRINT FUNCTIONS
+%=====================================================================
+
+print_cuMadness(Face1,Face2,Face3,Face4,Face5,Face6,Limits,Number,N):-
+	SpaceLim is Limits +1,
+	print_spaces(1,SpaceLim,1),
+	print_top_lines(Number),
+	print_face(Face1, 1, N, Limits,1),nl,
+	print_bot_lines(Number),write(' '),print_bot_lines(Number),write(' '),print_bot_lines(Number),print_bot_lines(Number),nl,
+	print_middle_faces(Face2,Face3,Face4,Face5,1,N,Limits),
+	print_spaces(1,SpaceLim,6),
+	print_top_lines(Number),
+	print_face(Face6,1,N,Limits,6).
+
 translate(1,' R ').
 translate(2,' Y ').
 translate(3,' G ').
-translate(4,' B ').		
+translate(4,' B ').	
 	
 print_top_lines(0):- nl.
 print_top_lines(N):- 
@@ -89,23 +103,48 @@ print_top_lines(N):-
 	NewN is N - 1,
 	print_top_lines(NewN).
 	
-print_bot_lines(0):- nl.
+print_bot_lines(0).
 print_bot_lines(N):- 
 	write(' -'),
 	NewN is N - 1,
 	print_bot_lines(NewN).
 
-print_line(_, _, 0):- write('|'), nl.
+print_line(_, _, 0):- write('|').
 print_line(L, Index, N):-
 	element(Index, L, C),
 	write('|'), translate(C,V), write(V),
 	NewI is Index + 1, NewN is N - 1,
 	print_line(L, NewI, NewN).
 
-print_face(_, Max, _, Max).
-print_face(L, Index, N, Max):-
-	print_line(L, Index, N),
+print_spaces(_,_,2).
+print_spaces(_,_,3).
+print_spaces(_,_,4).
+print_spaces(_,_,5).
+print_spaces(Lim,Lim,_).
+print_spaces(I,Lim,FaceNumber):-
+	NextI is I + 1,
+	write(' '),
+	print_spaces(NextI,Lim,FaceNumber).
+
+print_face(_, Max, _, Max,FNumber).
+print_face(L, Index, N, Max,FNumber):-
+	SpaceLim is Max +1,
+	print_spaces(1,SpaceLim,FNumber),
+	print_line(L, Index, N),nl,
 	Num is N * 2,
-	print_bot_lines(Num),
+	print_spaces(1,SpaceLim,FNumber),
 	NewI is Index + N,
-	print_cube(L, NewI, N, Max).
+	(NewI \== Max -> print_bot_lines(Num),nl ; print_bot_lines(Num)),
+	print_face(L, NewI, N, Max,FNumber).
+	
+print_middle_faces(_,_,_,_,Max, _, Max).
+print_middle_faces(F2,F3,F4,F5,Index, N, Max):-
+	print_line(F2, Index, N),
+	print_line(F3, Index, N),
+	print_line(F4, Index, N),
+	print_line(F5, Index, N),nl,
+	Num is N * 2,
+	print_spaces(1,Max,FNumber),
+	NewI is Index + N,
+	print_bot_lines(Num),write(' '),print_bot_lines(Num),write(' '),print_bot_lines(Num),write(' '),print_bot_lines(Num),nl,
+	print_middle_faces(F2,F3,F4,F5,NewI, N, Max).
