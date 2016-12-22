@@ -15,6 +15,8 @@ cuMadness(Cube,N):-
 build_cube(Cube,N):-
 	Cube = [F1, F2, F3, F4, F5, F6],
 	Units is N * N,
+	Max is Units + 1,
+	Num is N * 2,
 	length(F1, Units),
 	length(F2, Units),
 	length(F3, Units),
@@ -44,7 +46,9 @@ build_cube(Cube,N):-
 	labeling([maximize(SumF3)],F3),
 	labeling([maximize(SumF4)],F4),
 	labeling([maximize(SumF5)],F5),
-	labeling([maximize(SumF6)],F6).
+	labeling([maximize(SumF6)],F6),
+	print_top_lines(Num),
+	print_face(F1, 1, N, Max),!.
 	
 validate_face(_, Len,Len,_).
 validate_face(List,Index,Length,N):-
@@ -73,3 +77,35 @@ validate([T,B,L,R],P):-
 	(P #= 2 #=> GreenNeighbours #= 1),
 	(P #= 3 #=> BlueNeighbours #= 1),
 	(P #= 4 #=> RedNeighbours #= 1).
+	
+translate(1,' R ').
+translate(2,' Y ').
+translate(3,' G ').
+translate(4,' B ').		
+	
+print_top_lines(0):- nl.
+print_top_lines(N):- 
+	write(' -'),
+	NewN is N - 1,
+	print_top_lines(NewN).
+	
+print_bot_lines(0):- nl.
+print_bot_lines(N):- 
+	write(' -'),
+	NewN is N - 1,
+	print_bot_lines(NewN).
+
+print_line(_, _, 0):- write('|'), nl.
+print_line(L, Index, N):-
+	element(Index, L, C),
+	write('|'), translate(C,V), write(V),
+	NewI is Index + 1, NewN is N - 1,
+	print_line(L, NewI, NewN).
+
+print_face(_, Max, _, Max).
+print_face(L, Index, N, Max):-
+	print_line(L, Index, N),
+	Num is N * 2,
+	print_bot_lines(Num),
+	NewI is Index + N,
+	print_cube(L, NewI, N, Max).
