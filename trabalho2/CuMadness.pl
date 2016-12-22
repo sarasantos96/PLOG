@@ -9,232 +9,67 @@
 %The colours of its other neighbours do not matter
 
 %Red = 1, Yellow = 2, Green = 3, Blue = 4,
-cuMadness(Cube, Side):-
-	Units is (Side * Side),
-	length(Cube, Units),
-	domain(Cube, 1, 4),
-	fillFace(Cube,1,9,Side),
-	count(1, Cube, #=, RedCount),
-	labeling([maximize(RedCount)],Cube).
-	
-%declared in sictus manual
-exactly(_, [], 0). 
-exactly(Color, [L|Ls], N):-
-	Color #= L #<=> A,
-	N #= M+A,
-	exactly(Color, Ls, M).
-	
-fillFace(Cube, From, To, Side):-
-	placePeg(Cube, From, To, Side).
+cuMadness(Cube,N):-
+	build_cube(Cube,N).
 
-placePeg(_,Limit,_,_).
-
-%canto superior esquerdo	
-placePeg(Cube, Index, Limit, Side):-
-	element(Index, Cube, Fe),
-	Bot is Index + Side,
-	Right is Index + 1,
-	BotRight is Index + Side + 1,
-	element(Bot, Cube, Fb),
-	element(Right, Cube, Fr),
-	element(BotRight, Cube, Fbr),
-	(Fb #= 1 #\/ Fb #= 2 #\/ Fb #= 3 #\/ Fb #= 4),
-	(Fr #= 1 #\/ Fr #= 2 #\/ Fr #= 3 #\/ Fr #= 4),
-	(Fbr #= 1 #\/ Fbr #= 2 #\/ Fbr #= 3 #\/ Fbr #= 4),
-	(Fe #= 1 #/\ exactly(2,[Fb,Fbr,Fr],1)) #\/
-	(Fe #= 2 #/\ exactly(3,[Fb,Fbr,Fr],1)) #\/
-	(Fe #= 3 #/\ exactly(4,[Fb,Fbr,Fr],1)) #\/
-	(Fe #= 4 #/\ exactly(1,[Fb,Fbr,Fr],1)),
-	NewIndex is Index + 1,
-	placePeg(Cube, NewIndex, Limit, Side).
+build_cube(Cube,N):-
+	Cube = [F1, F2, F3, F4, F5, F6],
+	Units is N * N,
+	length(F1, Units),
+	length(F2, Units),
+	length(F3, Units),
+	length(F4, Units),
+	length(F5, Units),
+	length(F6, Units),
+	domain(F1,1,4),
+	domain(F2,1,4),
+	domain(F3,1,4),
+	domain(F4,1,4),
+	domain(F5,1,4),
+	domain(F6,1,4),
+	count(1,F1,#=,SumF1),
+	count(1,F2,#=,SumF2),
+	count(1,F3,#=,SumF3),
+	count(1,F4,#=,SumF4),
+	count(1,F5,#=,SumF5),
+	count(1,F6,#=,SumF6),
+	validate_face(F1,1,Units,N),
+	validate_face(F2,1,Units,N),
+	validate_face(F3,1,Units,N),
+	validate_face(F4,1,Units,N),
+	validate_face(F5,1,Units,N),
+	validate_face(F6,1,Units,N),
+	labeling([maximize(SumF1)],F1),
+	labeling([maximize(SumF2)],F2),
+	labeling([maximize(SumF3)],F3),
+	labeling([maximize(SumF4)],F4),
+	labeling([maximize(SumF5)],F5),
+	labeling([maximize(SumF6)],F6).
 	
-%linha superior
-placePeg(Cube, Index, Limit, Side):-
-	element(Index, Cube, Fe),
-	Left is Index - 1,
-	Right is Index + 1,
-	Bot is Index + Side,
-	BotRight is Index + Side + 1,
-	BotLeft is Index + Side - 1,
-	element(Left, Cube, Fl),
-	element(Right, Cube, Fr),
-	element(Bot, Cube, Fb),
-	element(BotRight, Cube, Fbr),
-	element(BotLeft, Cube, Fbl),
-	(Fb #= 1 #\/ Fb #= 2 #\/ Fb #= 3 #\/ Fb #= 4),
-	(Fl #= 1 #\/ Fl #= 2 #\/ Fl #= 3 #\/ Fl #= 4),
-	(Fr #= 1 #\/ Fr #= 2 #\/ Fr #= 3 #\/ Fr #= 4),
-	(Fbr #= 1 #\/ Fbr #= 2 #\/ Fbr #= 3 #\/ Fbr #= 4),
-	(Fbl #= 1 #\/ Fbl #= 2 #\/ Fbl #= 3 #\/ Fbl #= 4),
-	(Fe #= 1 #/\ exactly(2,[Fl,Fr,Fb,Fbr,Fbl],1)) #\/
-	(Fe #= 2 #/\ exactly(2,[Fl,Fr,Fb,Fbr,Fbl],1)) #\/
-	(Fe #= 3 #/\ exactly(2,[Fl,Fr,Fb,Fbr,Fbl],1)) #\/
-	(Fe #= 4 #/\ exactly(2,[Fl,Fr,Fb,Fbr,Fbl],1)),
+validate_face(_, Len,Len,_).
+validate_face(List,Index,Length,N):-
+	get_neighbours(Index,[T,B,L,R],N,List),
+	element(Index, List, P),
+	validate([T,B,L,R],P),
 	NewIndex is Index + 1,
-	placePeg(Cube, NewIndex, Limit, Side).
-
-%canto superior direito
-placePeg(Cube, Index, Limit, Side):-
-	element(Index,Cube,Fe),
-	Bot is Index + Side,
-	Left is Index - 1,
-	BotLeft is Index + Side - 1,
-	element(Bot,Cube,Fb),
-	element(Left,Cube,Fl),
-	element(BotLeft,Cube,Fbl),
-	(Fb #= 1 #\/ Fb #= 2 #\/ Fb #= 3 #\/ Fb #= 4),
-	(Fl #= 1 #\/ Fl #= 2 #\/ Fl #= 3 #\/ Fl #= 4),
-	(Fbl #= 1 #\/ Fbl #= 2 #\/ Fbl #= 3 #\/ Fbl #= 4),
-	(Fe #= 1 #/\ exactly(2,[Fb,Fl,Fbl], 1)) #\/
-	(Fe #= 2 #/\ exactly(3,[Fb,Fl,Fbl], 1)) #\/
-	(Fe #= 3 #/\ exactly(4,[Fb,Fl,Fbl], 1)) #\/
-	(Fe #= 4 #/\ exactly(1,[Fb,Fl,Fbl], 1)),
-	NewIndex is Index + 1,
-	placePeg(Cube, NewIndex, Limit, Side).
+	validate_face(List,NewIndex,Length,N).
 	
-%coluna mais à esquerda
-placePeg(Cube, Index, Limit, Side):-
-	element(Index, Cube, Fe),
-	Right is Index + 1,
-	Top is Index - Side,
-	TopRight is Index - Side + 1,
-	Bot is Index + Side,
-	BotRight is Index + Side + 1,
-	element(Right, Cube, Fr),
-	element(Bot, Cube, Fb),
-	element(BotRight, Cube, Fbr),
-	element(Top, Cube, Ft),
-	element(TopRight, Cube, Ftr),
-	(Ft #= 1 #\/ Ft #= 2 #\/ Ft #= 3 #\/ Ft #= 4),
-	(Fb #= 1 #\/ Fb #= 2 #\/ Fb #= 3 #\/ Fb #= 4),
-	(Fr #= 1 #\/ Fr #= 2 #\/ Fr #= 3 #\/ Fr #= 4),
-	(Ftr #= 1 #\/ Ftr #= 2 #\/ Ftr #= 3 #\/ Ftr #= 4),
-	(Fbr #= 1 #\/ Fbr #= 2 #\/ Fbr #= 3 #\/ Fbr #= 4),
-	(Fe #= 1 #/\ exactly(2,[Fr,Fb,Fbr,Ft,Ftr],1)) #\/
-	(Fe #= 2 #/\ exactly(3,[Fr,Fb,Fbr,Ft,Ftr],1)) #\/
-	(Fe #= 3 #/\ exactly(4,[Fr,Fb,Fbr,Ft,Ftr],1)) #\/
-	(Fe #= 4 #/\ exactly(1,[Fr,Fb,Fbr,Ft,Ftr],1)),
-	NewIndex is Index + 1,
-	placePeg(Cube, NewIndex, Limit, Side).
+get_neighbours(Pos,[T,B,Le,R],N,L):-
+	Top is Pos - N,
+	Bot is Pos + N,
+	Left is Pos -1,
+	Right is Pos + 1,
+	(Top > 0 -> element(Top,L,T) ; T is -1),
+	(Bot =< (N * N) -> element(Bot,L,B) ; B is -1),
+	((Pos \== 1 ,X is Left mod N, X \== 0)-> element(Left,L,Le) ; Le is -1),
+	((Y is Pos mod N, Y \== 0) -> element(Right,L,R) ; R is -1).
 	
-%centro
-placePeg(Cube, Index, Limit, Side):-
-	element(Index, Cube, Fe),
-	Top is Index - Side,
-	Bot is Index + Side,
-	Left is Index - 1,
-	Right is Index + 1,
-	TopRight is Index - Side + 1,
-	TopLeft is Index - Side - 1,
-	BotRight is Index + Side + 1,
-	BotLeft is Index + Side - 1,
-	element(Top, Cube, Ft),
-	element(Bot, Cube, Fb),
-	element(Left, Cube, Fl),
-	element(Right, Cube, Fr),
-	element(TopRight, Cube, Ftr),
-	element(TopLeft, Cube, Ftl),
-	element(BotRight, Cube, Fbr),
-	element(BotLeft, Cube, Fbl),
-	(Ft #= 1 #\/ Ft #= 2 #\/ Ft #= 3 #\/ Ft #= 4),
-	(Fb #= 1 #\/ Fb #= 2 #\/ Fb #= 3 #\/ Fb #= 4),
-	(Fl #= 1 #\/ Fl #= 2 #\/ Fl #= 3 #\/ Fl #= 4),
-	(Fr #= 1 #\/ Fr #= 2 #\/ Fr #= 3 #\/ Fr #= 4),
-	(Ftr #= 1 #\/ Ftr #= 2 #\/ Ftr #= 3 #\/ Ftr #= 4),
-	(Ftl #= 1 #\/ Ftl #= 2 #\/ Ftl #= 3 #\/ Ftl #= 4),
-	(Fbr #= 1 #\/ Fbr #= 2 #\/ Fbr #= 3 #\/ Fbr #= 4),
-	(Fbl #= 1 #\/ Fbl #= 2 #\/ Fbl #= 3 #\/ Fbl #= 4),
-	(Fe #= 1 #/\ exactly(2,[Ft,Ftr,Ftl,Fb,Fbr,Fbl,Fl,Fr],1)) #\/
-	(Fe #= 2 #/\ exactly(3,[Ft,Ftr,Ftl,Fb,Fbr,Fbl,Fl,Fr],1)) #\/
-	(Fe #= 3 #/\ exactly(4,[Ft,Ftr,Ftl,Fb,Fbr,Fbl,Fl,Fr],1)) #\/
-	(Fe #= 4 #/\ exactly(1,[Ft,Ftr,Ftl,Fb,Fbr,Fbl,Fl,Fr],1)),
-	NewIndex is Index + 1,
-	placePeg(Cube, NewIndex, Limit, Side).
-
-%coluna mais à direita
-placePeg(Cube, Index, Limit, Side):-
-	element(Index, Cube, Fe),
-	Left is Index - 1,
-	Top is Index - Side,
-	TopLeft is Index - Side - 1,
-	Bot is Index + Side,
-	BotLeft is Index + Side - 1,
-	element(Left, Cube, Fl),
-	element(Bot, Cube, Fb),
-	element(BotLeft, Cube, Fbl),
-	element(Top, Cube, Ft),
-	element(TopLeft, Cube, Ftl),
-	(Ft #= 1 #\/ Ft #= 2 #\/ Ft #= 3 #\/ Ft #= 4),
-	(Fb #= 1 #\/ Fb #= 2 #\/ Fb #= 3 #\/ Fb #= 4),
-	(Fl #= 1 #\/ Fl #= 2 #\/ Fl #= 3 #\/ Fl #= 4),
-	(Ftl #= 1 #\/ Ftl #= 2 #\/ Ftl #= 3 #\/ Ftl #= 4),
-	(Fbl #= 1 #\/ Fbl #= 2 #\/ Fbl #= 3 #\/ Fbl #= 4),
-	(Fe #= 1 #/\ exactly(2,[Fl,Fb,Fbl,Ft,Ftl],1)) #\/
-	(Fe #= 2 #/\ exactly(3,[Fl,Fb,Fbl,Ft,Ftl],1)) #\/
-	(Fe #= 3 #/\ exactly(4,[Fl,Fb,Fbl,Ft,Ftl],1)) #\/
-	(Fe #= 4 #/\ exactly(1,[Fl,Fb,Fbl,Ft,Ftl],1)),
-	NewIndex is Index + 1,
-	placePeg(Cube, NewIndex, Limit, Side).
-
-%canto inferior esquerdo
-placePeg(Cube, Index, Limit, Side):-
-	element(Index, Cube, Fe),
-	Top is Index - Side,
-	TopRight is Index - Side + 1,
-	Right is Index + 1,
-	element(Top, Cube, Ft),
-	element(TopRight, Cube, Ftr),
-	element(Right, Cube, Fr),
-	(Ft #= 1 #\/ Ft #= 2 #\/ Ft #= 3 #\/ Ft #= 4),
-	(Fr #= 1 #\/ Fr #= 2 #\/ Fr #= 3 #\/ Fr #= 4),
-	(Ftr #= 1 #\/ Ftr #= 2 #\/ Ftr #= 3 #\/ Ftr #= 4),
-	(Fe #= 1 #/\ exactly(2,[Ft, Ftr, Fr], 1)) #\/
-	(Fe #= 2 #/\ exactly(3,[Ft, Ftr, Fr], 1)) #\/
-	(Fe #= 3 #/\ exactly(4,[Ft, Ftr, Fr], 1)) #\/
-	(Fe #= 4 #/\ exactly(1,[Ft, Ftr, Fr], 1)),
-	NewIndex is Index + 1,
-	placePeg(Cube, NewIndex, Limit, Side).
-
-%linha inferior
-placePeg(Cube, Index, Limit, Side):-
-	element(Index, Cube, Fe),
-	Left is Index - 1,
-	Right is Index + 1,
-	Top is Index - Side,
-	TopRight is Index - Side + 1,
-	TopLeft is Index - Side - 1,
-	element(Left, Cube, Fl),
-	element(Right, Cube, Fr),
-	element(Top, Cube, Ft),
-	element(TopRight, Cube, Ftr),
-	element(TopLeft, Cube, Ftl),
-	(Fl #= 1 #\/ Fl #= 2 #\/ Fl #= 3 #\/ Fl #= 4),
-	(Ft #= 1 #\/ Ft #= 2 #\/ Ft #= 3 #\/ Ft #= 4),
-	(Fr #= 1 #\/ Fr #= 2 #\/ Fr #= 3 #\/ Fr #= 4),
-	(Ftr #= 1 #\/ Ftr #= 2 #\/ Ftr #= 3 #\/ Ftr #= 4),
-	(Ftl #= 1 #\/ Ftl #= 2 #\/ Ftl #= 3 #\/ Ftl #= 4),
-	(Fe #= 1 #/\ exactly(2,[Fl,Fr,Ft,Ftr,Ftl],1)) #\/
-	(Fe #= 2 #/\ exactly(3,[Fl,Fr,Ft,Ftr,Ftl],1)) #\/
-	(Fe #= 3 #/\ exactly(4,[Fl,Fr,Ft,Ftr,Ftl],1)) #\/
-	(Fe #= 4 #/\ exactly(1,[Fl,Fr,Ft,Ftr,Ftl],1)),
-	NewIndex is Index + 1,
-	placePeg(Cube, NewIndex, Limit, Side).	
-	
-%canto inferior direito
-placePeg(Cube, Index, Limit, Side):-
-	element(Index, Cube, Fe),
-	Top is Index - Side,
-	TopLeft is Index + Side - 1,
-	Left is Index - 1,
-	element(Top, Cube, Ft),
-	element(TopLeft, Cube, Ftl),
-	element(Left, Cube, Fl),
-	(Ft #= 1 #\/ Ft #= 2 #\/ Ft #= 3 #\/ Ft #= 4),
-	(Fl #= 1 #\/ Fl #= 2 #\/ Fl #= 3 #\/ Fl #= 4),
-	(Ftl #= 1 #\/ Ftl #= 2 #\/ Ftl #= 3 #\/ Ftl #= 4),
-	(Fe #= 1 #/\ exactly(2,[Ft, Ftl, Fl], 1)) #\/
-	(Fe #= 2 #/\ exactly(3,[Ft, Ftl, Fl], 1)) #\/
-	(Fe #= 3 #/\ exactly(4,[Ft, Ftl, Fl], 1)) #\/
-	(Fe #= 4 #/\ exactly(1,[Ft, Ftl, Fl], 1)),
-	NewIndex is Index + 1,
-	placePeg(Cube, NewIndex, Limit, Side).
+validate([T,B,L,R],P):-
+	count(1,[T,B,L,R],#=,RedNeighbours),
+	count(2,[T,B,L,R],#=,YellowNeighbours),
+	count(3,[T,B,L,R],#=,GreenNeighbours),
+	count(4,[T,B,L,R],#=,BlueNeighbours),
+	(P #= 1 #=> YellowNeighbours #= 1),
+	(P #= 2 #=> GreenNeighbours #= 1),
+	(P #= 3 #=> BlueNeighbours #= 1),
+	(P #= 4 #=> RedNeighbours #= 1).
