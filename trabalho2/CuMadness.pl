@@ -29,18 +29,18 @@ build_cube(Cube,N):-
 	domain(F4,1,4),
 	domain(F5,1,4),
 	domain(F6,1,4),
-	validate_face_1(F1,1,Units,N, [F2,F3,F4,F5]),
-	validate_face_2(F2,1,Units,N, [F1,F3,F5,F6]),
-	validate_face_3(F3,1,Units,N, [F1,F2,F4,F6]),
-	validate_face_4(F4,1,Units,N, [F1,F3,F5,F6]),
-	validate_face_5(F5,1,Units,N, [F1,F2,F4,F6]),
-	validate_face_6(F6,1,Units,N, [F2,F3,F4,F5]),
 	count(1,F1,#=,SumF1),
 	count(1,F2,#=,SumF2),
 	count(1,F3,#=,SumF3),
 	count(1,F4,#=,SumF4),
 	count(1,F5,#=,SumF5),
 	count(1,F6,#=,SumF6),
+	validate_face_1(F1,1,Units,N,[F2,F3,F4,F5]),
+	validate_face_2(F2,1,Units,N,[F1,F3,F5,F6]),
+	validate_face_3(F3,1,Units,N,[F1,F2,F4,F6]),
+	validate_face_4(F4,1,Units,N,[F1,F3,F5,F6]),
+	validate_face_5(F5,1,Units,N,[F1,F2,F4,F6]),
+	validate_face_6(F6,1,Units,N,[F2,F3,F4,F5]),
 	labeling([maximize(SumF1)],F1),
 	labeling([maximize(SumF2)],F2),
 	labeling([maximize(SumF3)],F3),
@@ -48,7 +48,7 @@ build_cube(Cube,N):-
 	labeling([maximize(SumF5)],F5),
 	labeling([maximize(SumF6)],F6),
 	print_top_lines(Num),
-	print_face(F1, 1, N, Max),!.
+	print_face(F4, 1, N, Max),!.
 
 validate_face_1(_, Len,Len,_,_).
 validate_face_1(List,Index,Length,N,[F2,F3,F4,F5]):-
@@ -56,7 +56,7 @@ validate_face_1(List,Index,Length,N,[F2,F3,F4,F5]):-
 	element(Index, List, P),
 	validate([T,B,L,R],P),
 	NewIndex is Index + 1,
-	validate_face(List,NewIndex,Length,N).
+	validate_face_1(List,NewIndex,Length,N,[F2,F3,F4,F5]).
 
 get_neighbours_1(Pos,[T,B,Le,R],N,L, [F2,F3,F4,F5]):-
 	Top is Pos - N,
@@ -64,7 +64,7 @@ get_neighbours_1(Pos,[T,B,Le,R],N,L, [F2,F3,F4,F5]):-
 	Left is Pos -1,
 	Right is Pos + 1,
 	(Top > 0 -> element(Top,L,T) ; (Pos == 1 -> element(3, F5, T) ; (Pos == 2 -> element(2, F5, T) ; (Pos == 3 , element(1, F5, T))))),
-	(Bot =< (N * N) -> element(Bot,L,B) ; (Pos == 7 -> element(1, F3, B) ; (Pos == 8 -> element(2, F3, B) ; (Pos == 9 , element(2, F3, B))))),
+	(Bot =< (N * N) -> element(Bot,L,B) ; (Pos == 7 -> element(1, F3, B) ; (Pos == 8 -> element(2, F3, B) ; (Pos == 9 , element(3, F3, B))))),
 	((Pos \== 1 ,X is Left mod N, X \== 0)-> element(Left,L,Le) ; (Pos == 1 -> element(1, F2, Le) ; (Pos == 4 -> element(2, F2, Le) ; (Pos == 7 , element(3, F2, Le))))),
 	((Y is Pos mod N, Y \== 0) -> element(Right,L,R) ; (Pos == 3 -> element(3,F4,R) ; (Pos == 6 -> element(2,F4,R) ; (Pos == 9 , element(1,F4,R))))).	
 
@@ -74,7 +74,7 @@ validate_face_2(List,Index,Length,N,[F1,F3,F5,F6]):-
 	element(Index, List, P),
 	validate([T,B,L,R],P),
 	NewIndex is Index + 1,
-	validate_face(List,NewIndex,Length,N).
+	validate_face_2(List,NewIndex,Length,N,[F1,F3,F5,F6]).
 
 get_neighbours_2(Pos,[T,B,Le,R],N,L,[F1,F3,F5,F6]):-
 	Top is Pos - N,
@@ -92,7 +92,7 @@ validate_face_3(List,Index,Length,N,[F1,F2,F4,F6]):-
 	element(Index, List, P),
 	validate([T,B,L,R],P),
 	NewIndex is Index + 1,
-	validate_face(List,NewIndex,Length,N).
+	validate_face_3(List,NewIndex,Length,N,[F1,F2,F4,F6]).
 
 get_neighbours_3(Pos,[T,B,Le,R],N,L,[F1,F2,F4,F6]):-
 	Top is Pos - N,
@@ -110,7 +110,7 @@ validate_face_4(List,Index,Length,N,[F1,F3,F5,F6]):-
 	element(Index, List, P),
 	validate([T,B,L,R],P),
 	NewIndex is Index + 1,
-	validate_face(List,NewIndex,Length,N).
+	validate_face_4(List,NewIndex,Length,N,[F1,F3,F5,F6]).
 
 get_neighbours_4(Pos,[T,B,Le,R],N,L,[F1,F3,F5,F6]):-
 	Top is Pos - N,
@@ -128,7 +128,7 @@ validate_face_5(List,Index,Length,N,[F1,F2,F4,F6]):-
 	element(Index, List, P),
 	validate([T,B,L,R],P),
 	NewIndex is Index + 1,
-	validate_face(List,NewIndex,Length,N).
+	validate_face_5(List,NewIndex,Length,N,[F1,F2,F4,F6]).
 
 get_neighbours_5(Pos,[T,B,Le,R],N,L,[F1,F2,F4,F6]):-
 	Top is Pos - N,
@@ -146,7 +146,7 @@ validate_face_6(List,Index,Length,N,[F2,F3,F4,F5]):-
 	element(Index, List, P),
 	validate([T,B,L,R],P),
 	NewIndex is Index + 1,
-	validate_face(List,NewIndex,Length,N).
+	validate_face_6(List,NewIndex,Length,N, [F2,F3,F4,F5]).
 
 get_neighbours_6(Pos,[T,B,Le,R],N,L,[F2,F3,F4,F5]):-
 	Top is Pos - N,
