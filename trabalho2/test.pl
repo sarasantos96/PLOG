@@ -12,7 +12,7 @@ cuMadness(L,N):-
 	Max is Len + 1,
 	Num is N * 2,
 	print_top_lines(Num),
-	print_cube(L, 1, N, Max).
+	print_cube(L, 1, N, Max),!.
 	
 game(L,N):-
 	Len is N * N,
