@@ -9,8 +9,8 @@
 %The colours of its other neighbours do not matter
 
 %Red = 1, Yellow = 2, Green = 3, Blue = 4,
-cuMadness(Cube,N):-
-	build_cube(Cube,N).
+cuMadness(Cube):-
+	build_cube(Cube,3).
 
 build_cube(Cube,N):-
 	Cube = [F1, F2, F3, F4, F5, F6],
@@ -173,7 +173,6 @@ validate([T,B,L,R],P):-
 %=====================================================================
 
 print_cuMadness(Face1,Face2,Face3,Face4,Face5,Face6,Limits,Number,N):-
-	SpaceLim is Limits +1,
 	print_spaces(1),
 	print_top_lines(Number),
 	print_face(Face1, 1, N, Limits,1),nl,
@@ -213,9 +212,8 @@ print_spaces(1):-
 print_spaces(6):-
 	write('             ').
 
-print_face(_, Max, _, Max,FNumber).
+print_face(_, Max, _, Max,_).
 print_face(L, Index, N, Max,FNumber):-
-	SpaceLim is Max +1,
 	print_spaces(FNumber),
 	print_line(L, Index, N),nl,
 	Num is N * 2,
